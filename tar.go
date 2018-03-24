@@ -147,6 +147,17 @@ func tarFile(tarWriter *tar.Writer, source, dest string) error {
 
 		if baseDir != "" {
 			header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, source))
+			if header.Linkname != "" {
+				link, err := os.Readlink(path)
+				if err != nil {
+					return err
+				}
+				rel, err := filepath.Rel(filepath.Dir(path), link)
+				if err != nil {
+					return err
+				}
+				header.Linkname = rel
+			}
 		}
 
 		if header.Name == dest {
