@@ -152,7 +152,7 @@ func tarFile(tarWriter *tar.Writer, source, dest string) error {
 				if err != nil {
 					return err
 				}
-				rel, err := filepath.Rel(filepath.Dir(path), link)
+				rel, err := relativeLink(path, link)
 				if err != nil {
 					return err
 				}
@@ -242,4 +242,11 @@ func untarFile(tr *tar.Reader, header *tar.Header, destination string) error {
 	default:
 		return fmt.Errorf("%s: unknown type flag: %c", header.Name, header.Typeflag)
 	}
+}
+
+func relativeLink(path, link string) (string, error) {
+	if filepath.IsAbs(link) {
+		return filepath.Rel(filepath.Dir(path), link)
+	}
+	return link, nil
 }
